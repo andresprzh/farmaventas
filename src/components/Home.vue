@@ -96,7 +96,7 @@
             type="file"
             title="Cargar Acrhivo"
             :disabled="!valid"
-            @click="submit"
+            @click="submit()"
           >Cargar 
           </v-btn>
         </v-flex>
@@ -310,19 +310,28 @@ export default class Home extends Vue {
   private submit(): void {
     this.$validator.validateAll().then((result) => {
       if (result) {
-        alert('hola');
+        const path = 'http://localhost:5000/ping';
+        this.axios.get(path)
+          .then((res) => {
+            // this.msg = res.data;
+            alert(res.data);
+          })
+          .catch((error) => {
+            // eslint-disable-next-line
+            console.error(error);
+        });
       }
     });
     const ent = this.entradas[0];
   }
-  private fecha(ref: any,dato: string) :void {
+  private fecha(ref: any, dato: string): void {
     this.validar();
     ref.save(dato);
   }
-  private validar(): void{
+  private validar(): void {
     this.$validator.validateAll().then((result) => {
-      if (result) {        
-        this.valid=true;
+      if (result) {
+        this.valid = true;
       }
     });
   }
