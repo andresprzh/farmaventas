@@ -12,30 +12,36 @@
         :key="card.id"
         > 
          <v-menu v-if="card.tipo==='fecha'"
+            lazy
             ref="menu"
             :close-on-content-click="false"
             v-model="card.menu"
             :nudge-right="40"
             :return-value.sync="card.dato"
-            lazy
             transition="scale-transition"
             offset-y
             full-width
             max-width="290px"
-            min-width="290px"
-             
+            min-width="290px"  
           >
             <v-text-field
               slot="activator"
               v-model="card.dato"
               :label=card.titulo
-              
+              prepend-icon="fa-calendar-alt"
+              readonly
+              :value="card.dato"
+              :error-messages="errors.collect(card.id)"
+              v-validate="'required'"
+              :data-vv-name=card.id
+              @change="validar()"
             ></v-text-field>
+            <!-- <v-date-picker :value="card.dato" v-model="card.dato" @input="card.menu = false" no-title autosave>
+							</v-date-picker> -->
             <v-date-picker
               v-model="card.dato"
               no-title
               scrollable
-              
             >
               <v-spacer></v-spacer>
               <v-btn flat color="primary" @click="card.menu = false">Cancel</v-btn>
@@ -45,8 +51,15 @@
           </v-menu>
 
           <v-select v-else-if="card.tipo==='select'"
-              :items="card.items"
-              label="Sede"
+            ref="menu"
+            v-validate="'required'"
+            :items="card.items"
+            v-model="card.dato"
+            :error-messages="errors.collect(card.id)"
+            label="Sede"
+            :data-vv-name=card.id
+            @change="validar()"
+            required
           ></v-select>
           <v-text-field v-else
           ref="menu"
@@ -56,6 +69,7 @@
           :label=card.titulo
           :data-vv-name=card.id 
           required
+          @change="validar()"
           ></v-text-field>
         </v-flex>
       </v-layout>
@@ -74,7 +88,7 @@
         </v-flex>
       </v-layout>
       
-      <!-- <v-layout row wrap>
+      <v-layout row wrap>
         <v-flex xs12 md2 v-show="true" >
           <v-btn round
             color="primary"
@@ -85,7 +99,7 @@
           >Cargar 
           </v-btn>
         </v-flex>
-      </v-layout> -->
+      </v-layout>
     </v-form> 
 
 
@@ -136,8 +150,8 @@ export default class Home extends Vue {
   // private entradas: object [];
   private entradas = [
     { id: 'dia', titulo: 'Dia', dato: '', tipo: 'fecha', menu: null },
-    // { id: 'coddia', titulo: 'Codigo Drogueria', dato: '', tipo: 'numero' },
-    { id: 'coddia', titulo: 'Codigo Drogueria', dato: '', tipo: 'select', items: ['sede1', 'sede2', 'sede3'] },
+    // { id: 'drog', titulo: 'Codigo Drogueria', dato: '', tipo: 'numero' },
+    { id: 'drog', titulo: 'Codigo Drogueria', dato: '', tipo: 'select', items: ['sede1', 'sede2', 'sede3'] },
     { id: 'nombre', titulo: 'Nombre', dato: '', tipo: 'texto' },
     { id: 'codcompra', titulo: 'codigo compra', dato: '', tipo: 'numero' },
     { id: 'ftramite', titulo: 'Fecha tramite', dato: '', tipo: 'fecha', menu: null },
@@ -256,8 +270,8 @@ export default class Home extends Vue {
         required: () => 'Por favor seleccione un dia ',
         // custom messages
       },
-      coddia: {
-        required: 'Por favor digite el codigo del dia',
+      drog: {
+        required: 'Por favor seleccione una sede',
       },
       nombre: {
         required: 'Por favor digite el nombre',
@@ -280,21 +294,30 @@ export default class Home extends Vue {
   }
 
   private processFile(event: any) {
-    // this.$validator.validateAll();
-    
-    this.file = event.target.files[0];
-    // const valid: boolean = true;
-    if (this.valid) {
-      // alert('hola');
-      this.mostrart = true;
-    }
-    // console.log(this.file);
+    this.$validator.validateAll().then((result) => {
+      if (result) {
+        this.file = event.target.files[0];
+        // const valid: boolean = true;
+        if (this.valid) {
+          // alert('hola');
+          this.mostrart = true;
+        }
+        // console.log(this.file);
+      }
+    });
   }
   private submit(): void {
-    this.$validator.validateAll();
+    this.$validator.validateAll().then((result) => {
+      if (result) {
+        alert('hola');
+      }
+    });
     const ent = this.entradas[0];
-    // const dato=ent.dato;
-    // console.log(ent.dato);
+  }
+
+  private validar(): void{
+    this.$validator.validateAll().then((result) => {
+    });
   }
 }
 </script>
@@ -310,8 +333,8 @@ export default class Home extends Vue {
   }
 
   input[type=file] + label {
-    font-size: 1.25em;
-    padding: 3%;
+    /* font-size: 1.25em; */
+    padding: 5px;
     border-radius: 20px;
     font-weight: 700;
     color: white;
