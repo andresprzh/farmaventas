@@ -3,13 +3,13 @@ CREATE DATABASE  IF NOT EXISTS farmaventas;
 USE farmaventas;
 
 CREATE TABLE IF NOT EXISTS copid(
-	id_copid INT(10) NOT NULL AUTO_INCREMENT,
+	id_copi INT(10) NOT NULL AUTO_INCREMENT,
 	cod_drog INT(5),
 	fecha DATE,
 	factura	INT(20),
 	refcopi	INT(15),
 	descripcion CHAR(60),
-	cod_barras INT(13)
+	cod_barras INT(13),
 	cantidad INT(7),
 	costo_desc INT(10),
 	costo_full INT(10),
