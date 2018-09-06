@@ -26,7 +26,7 @@
           >
             <v-text-field
               slot="activator"
-              v-model="card.dato"
+              :v-model="card.dato"
               :label=card.titulo
               prepend-icon="fa-calendar-alt"
               readonly
@@ -34,7 +34,7 @@
               :error-messages="errors.collect(card.id)"
               v-validate="'required'"
               :data-vv-name=card.id
-              @change="validar()"
+              @input="validar()"
             ></v-text-field>
             <!-- <v-date-picker :value="card.dato" v-model="card.dato" @input="card.menu = false" no-title autosave>
 							</v-date-picker> -->
@@ -44,8 +44,9 @@
               scrollable
             >
               <v-spacer></v-spacer>
-              <v-btn flat color="primary" @click="card.menu = false">Cancel</v-btn>
-              <v-btn flat color="primary" @click="$refs.menu[index].save(card.dato)">OK</v-btn>
+              <v-btn flat color="primary" @click="validar();card.menu = false">Cancel</v-btn>
+              <!-- <v-btn flat color="primary" @click="validar();$refs.menu[index].save(card.dato)">OK</v-btn> -->
+              <v-btn flat color="primary" @click="fecha($refs.menu[index],card.dato)">OK</v-btn>
               <!-- <v-btn flat color="primary" @click="foo(index,card.dato)">OK</v-btn> -->
             </v-date-picker>
           </v-menu>
@@ -314,9 +315,15 @@ export default class Home extends Vue {
     });
     const ent = this.entradas[0];
   }
-
+  private fecha(ref: any,dato: string) :void {
+    this.validar();
+    ref.save(dato);
+  }
   private validar(): void{
     this.$validator.validateAll().then((result) => {
+      if (result) {        
+        this.valid=true;
+      }
     });
   }
 }
