@@ -1,12 +1,12 @@
-from modelo.copiapp_modelo import mdlArchivo
+from modelo.copiapp_modelo import ModeloCopiapp
 
 
-class Copiapp:
+class ControladorCopiapp:
 
     def __init__(self, file):
         self.file = file
         self.datos = []
-        self.modelo = mdlArchivo()
+        self.modelo = ModeloCopiapp()
 
     def setData(self):
         # se convierte el archivo en un array
@@ -42,10 +42,10 @@ class Copiapp:
     def getData(self):
         return self.datos
 
-    def insertarData(self,datfact):
+    def insertarData(self, datfact):
 
         datfact[0] = self.datos[0]['factura'].rstrip()
-        
+
         if self.modelo.insertarFact(datfact):
             data = self.datos
             # return data

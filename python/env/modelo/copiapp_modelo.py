@@ -1,6 +1,7 @@
 from modelo.conexion import Conexion
 
-class mdlArchivo(Conexion):
+
+class ModeloCopiapp(Conexion):
 
     def __init__(self):
         Conexion.__init__(self)
@@ -33,10 +34,11 @@ class mdlArchivo(Conexion):
         except:
             return False
 
-    def insertarFact(self,data):
+    def insertarFact(self, data):
 
-        sql="INSERT INTO factura(num_factura,nitcomp,codcomp,localizacion,fecha) VALUES('%s')" % ("','".join(data))
-        # return sql    
+        sql = "INSERT INTO factura(num_factura,nitcomp,codcomp,localizacion,fecha) VALUES('%s')" % (
+            "','".join(data))
+        # return sql
         try:
             self.cursor.execute(sql)
             self.conn.commit()

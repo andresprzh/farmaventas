@@ -17,6 +17,6 @@ class Conexion:
         self.conn = mysql.connect()
         self.cursor = self.conn.cursor()
 
-    def buscarItem(self):
-        self.cursor.execute("SELECT * from copi")
-        return self.cursor.fetchone()
+    def buscarItem(self, tabla):
+        self.cursor.execute("SELECT * from %s" % tabla)
+        return self.cursor.fetchall()
