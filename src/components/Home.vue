@@ -259,7 +259,11 @@ export default class Home extends Vue {
       if (result) {
         const path = "http://localhost:5000/ping";
         this.axios
-          .get(path)
+          .get(path, {
+            params: {
+              dato: "asdñdlakdlak"
+            }
+          })
           .then(res => {
             // this.msg = res.data;
             alert(res.data);

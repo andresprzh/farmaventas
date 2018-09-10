@@ -36,7 +36,9 @@ def allowed_file(filename):
 # sanity check route
 @app.route('/ping', methods=['GET'])
 def ping_pong():
-    return jsonify('pong!')
+    if request.method == 'GET':
+        dato = request.args.get('dato')
+        return jsonify(dato)
 
 
 @app.route('/copiupload', methods=['POST'])
