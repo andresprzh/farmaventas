@@ -34,31 +34,43 @@ def allowed_file(filename):
 
 
 # sanity check route
-@app.route('/ping', methods=['GET'])
+@app.route('/ping', methods=['GET', 'POST'])
 def ping_pong():
     if request.method == 'GET':
         dato = request.args.get('dato')
         return jsonify(dato)
+    if request.method == 'POST':
+        datos=request.form
+        return jsonify(datos)
 
 
 @app.route('/copiupload', methods=['POST'])
 def uploadfile():
-    if 'file' in request.files:
+    
+    if 'file' in request.files :
         file = request.files['file']
-
         # objfile = Archivo(file)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             fileupath = app.config['UPLOAD_FOLDER']+"/"+filename
             fileu = open(fileupath)
+            datfact = [
+                '',
+                request.form['nit'] ,
+                request.form['codigocom'],
+                request.form['sede'],
+                request.form['fecha']
+            ]
             objfile = Copiapp(fileu)
             objfile.setData()
-            res = objfile.insertarData()
+            res = objfile.insertarData(datfact)
             if res == True:
                 return jsonify(objfile.getData())
             else:
                 return jsonify(res)
+    else:
+        return 'Error'
 
 
 if __name__ == '__main__':

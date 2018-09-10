@@ -32,7 +32,7 @@
               readonly
               :value="card.dato"
               :error-messages="errors.collect(card.id)"
-              v-validate="'required'"
+              v-validate="card.validacion"
               :data-vv-name=card.id
               @input="validar()"
             ></v-text-field>
@@ -53,7 +53,7 @@
 
           <v-select v-else-if="card.tipo==='select'"
             ref="menu"
-            v-validate="'required'"
+            v-validate="card.validacion"
             :items="card.items"
             v-model="card.dato"
             :error-messages="errors.collect(card.id)"
@@ -65,7 +65,7 @@
           <v-text-field v-else
           ref="menu"
           v-model="card.dato"
-          v-validate="'required'"
+          v-validate="card.validacion"
           :error-messages="errors.collect(card.id)"
           :label=card.titulo
           :data-vv-name=card.id 
@@ -81,11 +81,14 @@
              type="file" name="file" id="file"
              :disabled="!valid"
              @change="processFile($event)"
+             @click="inputclick($event)"
              />
+             
             <label for="file">
               <v-icon style="color:white;">fa-upload</v-icon>
-                Subir archivo
+               {{filename}}
             </label>
+            
         </v-flex>
       </v-layout>
       
@@ -150,24 +153,27 @@ export default class Home extends Vue {
   /*===========================================================================================================
                                           ATRIBUTOS
   =============================================================================================================*/
-  private file: string = "any";
+  private file: any = {};
   private mostrart: boolean = false;
   // private Item: string = '';
+  private filename: string='Subir archivo';
   private valid = true;
   private items: object[] = [];
   // private entradas: object [];
   private entradas = [
-    { id: "dia", titulo: "Dia", dato: "", tipo: "fecha", menu: null },
+    { id: "dia", titulo: "Dia", dato: "", tipo: "fecha", menu: null, validacion:"required" },
     // { id: 'drog', titulo: 'Codigo Drogueria', dato: '', tipo: 'numero' },
     {
       id: "drog",
       titulo: "Codigo Drogueria",
       dato: "",
       tipo: "select",
-      items: ["sede1", "sede2", "sede3"]
+      items: ["009VE", "015VE", "017VE","020VE"],
+      validacion:"required"
     },
-    { id: "nombre", titulo: "Nombre", dato: "", tipo: "texto" },
-    { id: "codcompra", titulo: "codigo compra", dato: "", tipo: "numero" }
+    { id: "nombre", titulo: "Nombre", dato: "", tipo: "texto", validacion:"required"},
+    { id: "codcompra", titulo: "codigo comprador", dato: "", tipo: "numero", validacion:"required|max:4"},
+    { id: "nit", titulo: "NIT", dato: "", tipo: "texto", validacion:"required"},
   ];
 
   private headers = [
@@ -202,10 +208,14 @@ export default class Home extends Vue {
         required: "Por favor digite el nombre"
       },
       codcompra: {
-        required: "por favor digite el codigo de compra"
+        required: "por favor digite el codigo de compra",
+        max: "Maximo 4 caracteres"
       },
       ftramite: {
         required: "Por favor seleccione una fecha"
+      },
+      nit: {
+        required: "Por favor digite el NIT"        
       }
     }
   };
@@ -222,11 +232,19 @@ export default class Home extends Vue {
   }
 
   private processFile(event: any) {
+
     this.$validator.validateAll().then(result => {
       if (result) {
+        
         this.file = event.target.files[0];
+        this.filename=this.file.name;
         let formData = new FormData();
         formData.append("file", this.file);
+        formData.append("fecha", this.entradas[0].dato);
+        formData.append("sede", this.entradas[1].dato);
+        formData.append("nombre", this.entradas[2].dato);
+        formData.append("codigocom", this.entradas[3].dato);
+        formData.append("nit", this.entradas[4].dato);
         // const valid: boolean = true;
         const path = "http://localhost:5000/copiupload";
         this.axios
@@ -235,9 +253,10 @@ export default class Home extends Vue {
           })
           .then(res => {
             // this.msg = res.data;
-            // console.log(res.data);
+            console.log(res.data);
             if (res.data) {
               this.items = res.data;
+              this.mostrart = true;
             } else {
               alert("error al subir el arcivo");
             }
@@ -246,32 +265,58 @@ export default class Home extends Vue {
             // eslint-disable-next-line
             console.error(error);
           });
-        if (this.valid) {
-          // alert('hola');
-          this.mostrart = true;
-        }
-        // console.log(this.file);
       }
     });
   }
+
+  private inputclick(event: any){
+    this.$validator.validateAll().then(result => {
+      if (!result) {
+        event.preventDefault();
+      }
+    });
+  }
+
   private submit(): void {
+    
     this.$validator.validateAll().then(result => {
       if (result) {
+        let formData = new FormData();
+        formData.append("file", this.file);
+        formData.append("fecha", this.entradas[0].dato);
+        formData.append("sede", this.entradas[1].dato);
+        formData.append("nombre", this.entradas[2].dato);
+        formData.append("codigocom", this.entradas[3].dato);
+        formData.append("nit", this.entradas[4].dato);
         const path = "http://localhost:5000/ping";
+        // this.axios
+        //   .get(path, {
+        //     params: {
+        //       dato: "asdñdlakdlak"
+        //     }
+        //   })
+        //   .then(res => {
+        //     // this.msg = res.data;
+        //     alert(res.data);
+        //   })
+        //   .catch(error => {
+        //     // eslint-disable-next-line
+        //     console.error(error);
+        //   });
+
+
         this.axios
-          .get(path, {
-            params: {
-              dato: "asdñdlakdlak"
-            }
+        .post(path, formData, {
+            headers: { "Content-Type": "multipart/form-data" }
           })
           .then(res => {
             // this.msg = res.data;
-            alert(res.data);
+            console.log(res.data);
           })
           .catch(error => {
             // eslint-disable-next-line
             console.error(error);
-          });
+        });
       }
     });
     const ent = this.entradas[0];
@@ -302,8 +347,7 @@ input[type="file"] {
   z-index: -1;
 }
 
-input[type="file"] + label {
-  /* font-size: 1.25em; */
+input[type="file"] + label {  
   padding: 5px;
   border-radius: 20px;
   font-weight: 700;

@@ -1,6 +1,5 @@
 from modelo.conexion import Conexion
 
-
 class mdlArchivo(Conexion):
 
     def __init__(self):
@@ -27,6 +26,17 @@ class mdlArchivo(Conexion):
         # return sql
         # self.cursor.executemany(sql, vals)
 
+        try:
+            self.cursor.execute(sql)
+            self.conn.commit()
+            return True
+        except:
+            return False
+
+    def insertarFact(self,data):
+
+        sql="INSERT INTO factura(num_factura,nitcomp,codcomp,localizacion,fecha) VALUES('%s')" % ("','".join(data))
+        # return sql    
         try:
             self.cursor.execute(sql)
             self.conn.commit()

@@ -33,7 +33,7 @@ class Copiapp:
                 'cod_barras': fields[10],
                 'cod_fab': fields[11],
                 'control_line': int(fields[12]),
-                'descuento_2': float(fields[13]),
+                'descuento_2': float(fields[13])/100,
                 'unidad': fields[14],
                 'algo1': int(fields[15]),
                 'algo2': int(fields[16])
@@ -42,8 +42,13 @@ class Copiapp:
     def getData(self):
         return self.datos
 
-    def insertarData(self):
+    def insertarData(self,datfact):
 
-        data = self.datos
-        # return data
-        return (self.modelo.insertData(data))
+        datfact[0] = self.datos[0]['factura'].rstrip()
+        
+        if self.modelo.insertarFact(datfact):
+            data = self.datos
+            # return data
+            return (self.modelo.insertData(data))
+        else:
+            return False
