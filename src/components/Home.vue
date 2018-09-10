@@ -93,7 +93,6 @@
         <v-flex xs12 md2 v-show="true" >
           <v-btn round
             color="primary"
-            type="file"
             title="Cargar Acrhivo"
             :disabled="!valid"
             @click="submit()"
@@ -109,7 +108,7 @@
         <template>
           <v-data-table
             :headers="headers"
-            :items="desserts"
+            :items="items"
             class="elevation-1"
           >
             <template slot="headerCell" slot-scope="props">
@@ -123,12 +122,17 @@
               </v-tooltip>
             </template>
             <template slot="items" slot-scope="props">
-              <td>{{ props.item.name }}</td>
-              <td class="text-xs-right">{{ props.item.calories }}</td>
-              <td class="text-xs-right">{{ props.item.fat }}</td>
-              <td class="text-xs-right">{{ props.item.carbs }}</td>
-              <td class="text-xs-right">{{ props.item.protein }}</td>
-              <td class="text-xs-right">{{ props.item.iron }}</td>
+              <td class="text-xs-center">{{ props.item.cod_drog }}</td>
+              <td class="text-xs-center">{{ props.item.fecha }}</td>
+              <td class="text-xs-center">{{ props.item.factura }}</td>
+              <td class="text-xs-center">{{ props.item.refcopi }}</td>
+              <td class="text-xs-center">{{ props.item.descripcion }}</td>
+              <td class="text-xs-center">{{ props.item.cantidad }}</td>
+              <td class="text-xs-center">{{ props.item.costo_desc }}</td>
+              <td class="text-xs-center">{{ props.item.costo_full }}</td>
+              <td class="text-xs-center">{{ props.item.iva }}</td>
+              <td class="text-xs-center">{{ props.item.descuento }}</td>
+
             </template>
           </v-data-table>
         </template>
@@ -139,166 +143,109 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue } from "vue-property-decorator";
 
 @Component
 export default class Home extends Vue {
-
-  private file: any;
+  /*===========================================================================================================
+                                          ATRIBUTOS
+  =============================================================================================================*/
+  private file: string = "any";
   private mostrart: boolean = false;
   // private Item: string = '';
   private valid = true;
+  private items: object[] = [];
   // private entradas: object [];
   private entradas = [
-    { id: 'dia', titulo: 'Dia', dato: '', tipo: 'fecha', menu: null },
+    { id: "dia", titulo: "Dia", dato: "", tipo: "fecha", menu: null },
     // { id: 'drog', titulo: 'Codigo Drogueria', dato: '', tipo: 'numero' },
-    { id: 'drog', titulo: 'Codigo Drogueria', dato: '', tipo: 'select', items: ['sede1', 'sede2', 'sede3'] },
-    { id: 'nombre', titulo: 'Nombre', dato: '', tipo: 'texto' },
-    { id: 'codcompra', titulo: 'codigo compra', dato: '', tipo: 'numero' },
-    { id: 'ftramite', titulo: 'Fecha tramite', dato: '', tipo: 'fecha', menu: null },
+    {
+      id: "drog",
+      titulo: "Codigo Drogueria",
+      dato: "",
+      tipo: "select",
+      items: ["sede1", "sede2", "sede3"]
+    },
+    { id: "nombre", titulo: "Nombre", dato: "", tipo: "texto" },
+    { id: "codcompra", titulo: "codigo compra", dato: "", tipo: "numero" }
   ];
 
   private headers = [
-          {
-            text: 'Dessert (100g serving)',
-            align: 'left',
-            sortable: false,
-            value: 'name',
-          },
-          { text: 'Calories', value: 'calories' },
-          { text: 'Fat (g)', value: 'fat' },
-          { text: 'Carbs (g)', value: 'carbs' },
-          { text: 'Protein (g)', value: 'protein' },
-          { text: 'Iron (%)', value: 'iron' },
+    {
+      text: "Codigo Drogueria",
+      align: "left",
+      sortable: false,
+      value: "name"
+    },
+    { text: "Fecha", value: "fecha" },
+    { text: "Numero Factura", value: "factura" },
+    { text: "Referencia item", value: "ref" },
+    { text: "Descripcion", value: "descripcion" },
+    { text: "Cantidad", value: "cantidad" },
+    { text: "Costo Descuento", value: "costod" },
+    { text: "Costo Total", value: "costot" },
+    { text: "Iva", value: "iva" },
+    { text: "Descuento", value: "descuento" }
   ];
 
-  private desserts = [
-          {
-            value: false,
-            name: 'Frozen Yogurt',
-            calories: 159,
-            fat: 6.0,
-            carbs: 24,
-            protein: 4.0,
-            iron: '1%',
-          },
-          {
-            value: false,
-            name: 'Ice cream sandwich',
-            calories: 237,
-            fat: 9.0,
-            carbs: 37,
-            protein: 4.3,
-            iron: '1%',
-          },
-          {
-            value: false,
-            name: 'Eclair',
-            calories: 262,
-            fat: 16.0,
-            carbs: 23,
-            protein: 6.0,
-            iron: '7%',
-          },
-          {
-            value: false,
-            name: 'Cupcake',
-            calories: 305,
-            fat: 3.7,
-            carbs: 67,
-            protein: 4.3,
-            iron: '8%',
-          },
-          {
-            value: false,
-            name: 'Gingerbread',
-            calories: 356,
-            fat: 16.0,
-            carbs: 49,
-            protein: 3.9,
-            iron: '16%',
-          },
-          {
-            value: false,
-            name: 'Jelly bean',
-            calories: 375,
-            fat: 0.0,
-            carbs: 94,
-            protein: 0.0,
-            iron: '0%',
-          },
-          {
-            value: false,
-            name: 'Lollipop',
-            calories: 392,
-            fat: 0.2,
-            carbs: 98,
-            protein: 0,
-            iron: '2%',
-          },
-          {
-            value: false,
-            name: 'Honeycomb',
-            calories: 408,
-            fat: 3.2,
-            carbs: 87,
-            protein: 6.5,
-            iron: '45%',
-          },
-          {
-            value: false,
-            name: 'Donut',
-            calories: 452,
-            fat: 25.0,
-            carbs: 51,
-            protein: 4.9,
-            iron: '22%',
-          },
-          {
-            value: false,
-            name: 'KitKat',
-            calories: 518,
-            fat: 26.0,
-            carbs: 65,
-            protein: 7,
-            iron: '6%',
-          },
-  ];
   // Mensajes custom error vee validate
   private dictionary = {
     custom: {
       dia: {
-        required: () => 'Por favor seleccione un dia ',
+        required: () => "Por favor seleccione un dia "
         // custom messages
       },
       drog: {
-        required: 'Por favor seleccione una sede',
+        required: "Por favor seleccione una sede"
       },
       nombre: {
-        required: 'Por favor digite el nombre',
+        required: "Por favor digite el nombre"
       },
       codcompra: {
-        required: 'por favor digite el codigo de compra',
+        required: "por favor digite el codigo de compra"
       },
       ftramite: {
-        required: 'Por favor seleccione una fecha',
-      },
-    },
+        required: "Por favor seleccione una fecha"
+      }
+    }
   };
 
+  /*===========================================================================================================
+                                          METODOS
+  =============================================================================================================*/
   constructor() {
     super();
   }
 
   private mounted() {
-    this.$validator.localize('es', this.dictionary);
+    this.$validator.localize("es", this.dictionary);
   }
 
   private processFile(event: any) {
-    this.$validator.validateAll().then((result) => {
+    this.$validator.validateAll().then(result => {
       if (result) {
         this.file = event.target.files[0];
+        let formData = new FormData();
+        formData.append("file", this.file);
         // const valid: boolean = true;
+        const path = "http://localhost:5000/copiupload";
+        this.axios
+          .post(path, formData, {
+            headers: { "Content-Type": "multipart/form-data" }
+          })
+          .then(res => {
+            // this.msg = res.data;
+            // console.log(res.data);
+            if (res.data) {
+              this.items = res.data;
+            } else {
+              alert("error al subir el arcivo");
+            }
+          })
+          .catch(error => {
+            // eslint-disable-next-line
+            console.error(error);
+          });
         if (this.valid) {
           // alert('hola');
           this.mostrart = true;
@@ -308,28 +255,31 @@ export default class Home extends Vue {
     });
   }
   private submit(): void {
-    this.$validator.validateAll().then((result) => {
+    this.$validator.validateAll().then(result => {
       if (result) {
-        const path = 'http://localhost:5000/ping';
-        this.axios.get(path)
-          .then((res) => {
+        const path = "http://localhost:5000/ping";
+        this.axios
+          .get(path)
+          .then(res => {
             // this.msg = res.data;
             alert(res.data);
           })
-          .catch((error) => {
+          .catch(error => {
             // eslint-disable-next-line
             console.error(error);
-        });
+          });
       }
     });
     const ent = this.entradas[0];
   }
+
   private fecha(ref: any, dato: string): void {
     this.validar();
     ref.save(dato);
   }
+
   private validar(): void {
-    this.$validator.validateAll().then((result) => {
+    this.$validator.validateAll().then(result => {
       if (result) {
         this.valid = true;
       }
@@ -339,30 +289,30 @@ export default class Home extends Vue {
 </script>
 
 <style scoped>
-  input[type=file] {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1;
-  }
+input[type="file"] {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
 
-  input[type=file] + label {
-    /* font-size: 1.25em; */
-    padding: 5px;
-    border-radius: 20px;
-    font-weight: 700;
-    color: white;
-    background-color: #1B5E20;
-    display: inline-block;
-    cursor: pointer;
-  }
+input[type="file"] + label {
+  /* font-size: 1.25em; */
+  padding: 5px;
+  border-radius: 20px;
+  font-weight: 700;
+  color: white;
+  background-color: #1b5e20;
+  display: inline-block;
+  cursor: pointer;
+}
 
-  input[type=file]:focus + label,
-  input[type=file] + label:hover {
-      background-color: rgb(57, 148, 63);
-      outline: 1px dotted #000;
-	    outline: -webkit-focus-ring-color auto 5px;
-  }
+input[type="file"]:focus + label,
+input[type="file"] + label:hover {
+  background-color: rgb(57, 148, 63);
+  outline: 1px dotted #000;
+  outline: -webkit-focus-ring-color auto 5px;
+}
 </style>
