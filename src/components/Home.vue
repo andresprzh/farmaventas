@@ -90,7 +90,7 @@
         </v-flex>
       </v-layout>
       
-      <v-layout row wrap>
+      <!-- <v-layout row wrap>
         <v-flex xs12 md2 v-show="true" >
           <v-btn round
             color="primary"
@@ -100,12 +100,36 @@
           >Cargar 
           </v-btn>
         </v-flex>
-      </v-layout>
+      </v-layout> -->
+
     </v-form> 
 
-
+    
     <v-layout row wrap>
       <v-flex xs12 v-show="mostrart" >
+      <!-- <v-flex xs12  > -->
+        <v-tabs
+          centered
+          v-model="tabla"
+          
+          color="green"
+          dark
+          icons-and-text
+        >
+          <v-tabs-slider color="black"></v-tabs-slider>
+
+          <v-tab href="#encontrados">
+            Items encontrados
+            <v-icon>fa-clipboard-list</v-icon>
+          </v-tab>
+
+          <v-tab href="#noencontrados">
+            Items no encontrados
+            <v-icon>fa-box-open</v-icon>
+          </v-tab>
+
+        </v-tabs> 
+
         <template>
           <v-data-table
             :headers="headers"
@@ -123,17 +147,12 @@
               </v-tooltip>
             </template>
             <template slot="items" slot-scope="props">
-              <td class="text-xs-center">{{ props.item.cod_drog }}</td>
-              <td class="text-xs-center">{{ props.item.fecha }}</td>
-              <td class="text-xs-center">{{ props.item.factura }}</td>
-              <td class="text-xs-center">{{ props.item.refcopi }}</td>
               <td class="text-xs-center">{{ props.item.descripcion }}</td>
-              <td class="text-xs-center">{{ props.item.cantidad }}</td>
-              <td class="text-xs-center">{{ props.item.costo_desc }}</td>
-              <td class="text-xs-center">{{ props.item.costo_full }}</td>
+              <td class="text-xs-center">{{ props.item.precio_unidad }}</td>
+              <td class="text-xs-center">{{ props.item.unidad }}</td>
+              <td class="text-xs-center">{{ props.item.descuento1 }}</td>
               <td class="text-xs-center">{{ props.item.iva }}</td>
-              <td class="text-xs-center">{{ props.item.descuento }}</td>
-
+              <td class="text-xs-center">{{ props.item.transaccion }}</td>
             </template>
           </v-data-table>
         </template>
@@ -152,6 +171,7 @@ export default class Home extends Vue {
                                           ATRIBUTOS
   =============================================================================================================*/
   private file: any = {};
+  private tabla: string = "";
   private mostrart: boolean = false;
   // private Item: string = '';
   private filename: string = "Subir archivo";
@@ -193,16 +213,12 @@ export default class Home extends Vue {
   ];
 
   private headers = [
-    { text: "Codigo Drogueria", align: "left", sortable: false, value: "name" },
-    { text: "Fecha", value: "fecha" },
-    { text: "Numero Factura", value: "factura" },
-    { text: "Referencia item", value: "ref" },
-    { text: "Descripcion", value: "descripcion" },
-    { text: "Cantidad", value: "cantidad" },
-    { text: "Costo Descuento", value: "costod" },
-    { text: "Costo Total", value: "costot" },
-    { text: "Iva", value: "iva" },
-    { text: "Descuento", value: "descuento" }
+    { text: "Descripcion", align: "left", sortable: false, value: "name" },
+    { text: "Precio unidad", value: "fecha" },
+    { text: "Unidad", value: "factura" },
+    { text: "Descuento", value: "ref" },
+    { text: "Iva", value: "descripcion" },
+    { text: "Transaccion", value: "cantidad" }
   ];
 
   // Mensajes custom error vee validate
@@ -290,7 +306,7 @@ export default class Home extends Vue {
             }
           })
           .catch(error => {
-            // eslint-disable-next-line
+            // eslint-disable-next-linen
             console.error(error);
           });
       }
@@ -305,47 +321,27 @@ export default class Home extends Vue {
     });
   }
 
-  private submit(): void {
-    this.$validator.validateAll().then(result => {
-      if (result) {
-        let formData = new FormData();
-        formData.append("file", this.file);
-        formData.append("fecha", this.entradas[0].dato);
-        formData.append("sede", this.entradas[1].dato);
-        formData.append("nombre", this.entradas[2].dato);
-        formData.append("codigocom", this.entradas[3].dato);
-        const path = "http://localhost:5000/ping";
-        // this.axios
-        //   .get(path, {
-        //     params: {
-        //       dato: "asdñdlakdlak"
-        //     }
-        //   })
-        //   .then(res => {
-        //     // this.msg = res.data;
-        //     alert(res.data);
-        //   })
-        //   .catch(error => {
-        //     // eslint-disable-next-line
-        //     console.error(error);
-        //   });
-
-        this.axios
-          .post(path, formData, {
-            headers: { "Content-Type": "multipart/form-data" }
-          })
-          .then(res => {
-            // this.msg = res.data;
-            console.log(res.data);
-          })
-          .catch(error => {
-            // eslint-disable-next-line
-            console.error(error);
-          });
-      }
-    });
-    const ent = this.entradas[0];
-  }
+  // private submit(): void {
+  //   this.$validator.validateAll().then(result => {
+  //     if (result) {
+  //       const path = "http://localhost:5000/ping";
+  //       this.axios
+  //         .get(path, {
+  //           params: {
+  //             dato: "asdñdlakdlak"
+  //           }
+  //         })
+  //         .then(res => {
+  //           // this.msg = res.data;
+  //           alert(res.data);
+  //         })
+  //         .catch(error => {
+  //           // eslint-disable-next-line
+  //           console.error(error);
+  //         });
+  //     }
+  //   });
+  // }
 
   private fecha(ref: any, dato: string): void {
     this.validar();
