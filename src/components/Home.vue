@@ -36,8 +36,6 @@
               :data-vv-name=card.id
               @input="validar()"
             ></v-text-field>
-            <!-- <v-date-picker :value="card.dato" v-model="card.dato" @input="card.menu = false" no-title autosave>
-							</v-date-picker> -->
             <v-date-picker
               v-model="card.dato"
               no-title
@@ -45,9 +43,9 @@
             >
               <v-spacer></v-spacer>
               <v-btn flat color="primary" @click="validar();card.menu = false">Cancel</v-btn>
-              <!-- <v-btn flat color="primary" @click="validar();$refs.menu[index].save(card.dato)">OK</v-btn> -->
+              
               <v-btn flat color="primary" @click="fecha($refs.menu[index],card.dato)">OK</v-btn>
-              <!-- <v-btn flat color="primary" @click="foo(index,card.dato)">OK</v-btn> -->
+              
             </v-date-picker>
           </v-menu>
 
@@ -156,33 +154,46 @@ export default class Home extends Vue {
   private file: any = {};
   private mostrart: boolean = false;
   // private Item: string = '';
-  private filename: string='Subir archivo';
+  private filename: string = "Subir archivo";
   private valid = true;
   private items: object[] = [];
   // private entradas: object [];
   private entradas = [
-    { id: "dia", titulo: "Dia", dato: "", tipo: "fecha", menu: null, validacion:"required" },
-    // { id: 'drog', titulo: 'Codigo Drogueria', dato: '', tipo: 'numero' },
+    {
+      id: "dia",
+      titulo: "Dia",
+      dato: "",
+      tipo: "fecha",
+      menu: null,
+      validacion: "required"
+    },
     {
       id: "drog",
       titulo: "Codigo Drogueria",
       dato: "",
       tipo: "select",
-      items: ["009VE", "015VE", "017VE","020VE"],
-      validacion:"required"
+      // items: ["009VE", "015VE", "017VE", "020VE"],
+      items: [],
+      validacion: "required"
     },
-    { id: "nombre", titulo: "Nombre", dato: "", tipo: "texto", validacion:"required"},
-    { id: "codcompra", titulo: "codigo comprador", dato: "", tipo: "numero", validacion:"required|max:4"},
-    { id: "nit", titulo: "NIT", dato: "", tipo: "texto", validacion:"required"},
+    {
+      id: "nombre",
+      titulo: "Nombre",
+      dato: "",
+      tipo: "texto",
+      validacion: "required"
+    },
+    {
+      id: "codcompra",
+      titulo: "codigo comprador",
+      dato: "",
+      tipo: "numero",
+      validacion: "required|max:4"
+    }
   ];
 
   private headers = [
-    {
-      text: "Codigo Drogueria",
-      align: "left",
-      sortable: false,
-      value: "name"
-    },
+    { text: "Codigo Drogueria", align: "left", sortable: false, value: "name" },
     { text: "Fecha", value: "fecha" },
     { text: "Numero Factura", value: "factura" },
     { text: "Referencia item", value: "ref" },
@@ -215,7 +226,7 @@ export default class Home extends Vue {
         required: "Por favor seleccione una fecha"
       },
       nit: {
-        required: "Por favor digite el NIT"        
+        required: "Por favor digite el NIT"
       }
     }
   };
@@ -225,6 +236,26 @@ export default class Home extends Vue {
   =============================================================================================================*/
   constructor() {
     super();
+
+    const path = "http://localhost:5000/puntosv";
+    this.axios
+      .get(path, {
+        params: {
+          dato: "all"
+        }
+      })
+      .then(res => {
+        this.entradas[1].items = res.data.map(function(
+          value: any,
+          index: number
+        ) {
+          return value["num_sede"];
+        });
+      })
+      .catch(error => {
+        // eslint-disable-next-line
+        console.error(error);
+      });
   }
 
   private mounted() {
@@ -232,19 +263,16 @@ export default class Home extends Vue {
   }
 
   private processFile(event: any) {
-
     this.$validator.validateAll().then(result => {
       if (result) {
-        
         this.file = event.target.files[0];
-        this.filename=this.file.name;
+        this.filename = this.file.name;
         let formData = new FormData();
         formData.append("file", this.file);
         formData.append("fecha", this.entradas[0].dato);
         formData.append("sede", this.entradas[1].dato);
         formData.append("nombre", this.entradas[2].dato);
         formData.append("codigocom", this.entradas[3].dato);
-        formData.append("nit", this.entradas[4].dato);
         // const valid: boolean = true;
         const path = "http://localhost:5000/copiupload";
         this.axios
@@ -269,7 +297,7 @@ export default class Home extends Vue {
     });
   }
 
-  private inputclick(event: any){
+  private inputclick(event: any) {
     this.$validator.validateAll().then(result => {
       if (!result) {
         event.preventDefault();
@@ -278,7 +306,6 @@ export default class Home extends Vue {
   }
 
   private submit(): void {
-    
     this.$validator.validateAll().then(result => {
       if (result) {
         let formData = new FormData();
@@ -287,7 +314,6 @@ export default class Home extends Vue {
         formData.append("sede", this.entradas[1].dato);
         formData.append("nombre", this.entradas[2].dato);
         formData.append("codigocom", this.entradas[3].dato);
-        formData.append("nit", this.entradas[4].dato);
         const path = "http://localhost:5000/ping";
         // this.axios
         //   .get(path, {
@@ -304,9 +330,8 @@ export default class Home extends Vue {
         //     console.error(error);
         //   });
 
-
         this.axios
-        .post(path, formData, {
+          .post(path, formData, {
             headers: { "Content-Type": "multipart/form-data" }
           })
           .then(res => {
@@ -316,7 +341,7 @@ export default class Home extends Vue {
           .catch(error => {
             // eslint-disable-next-line
             console.error(error);
-        });
+          });
       }
     });
     const ent = this.entradas[0];
@@ -347,7 +372,7 @@ input[type="file"] {
   z-index: -1;
 }
 
-input[type="file"] + label {  
+input[type="file"] + label {
   padding: 5px;
   border-radius: 20px;
   font-weight: 700;

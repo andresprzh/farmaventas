@@ -3,7 +3,9 @@ from flask import Flask, jsonify, request, json, abort
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
+
 from controlador.copiapp_controlador import ControladorCopiapp
+from controlador.sede_controlador import ControladorSede
 
 FILE_PATH = os.path.abspath(__file__)
 UPLOAD_FOLDER = os.path.dirname(FILE_PATH)+'/temp'
@@ -47,8 +49,9 @@ def ping_pong():
 @app.route('/puntosv', methods=['GET', 'POST'])
 def puntos():
     if request.method == 'GET':
-        dato = request.args.get('dato')
-        return jsonify(dato)
+        controlador = ControladorSede()
+        res = controlador.getSedes()
+        return jsonify(res)
     if request.method == 'POST':
         datos = request.form
         return jsonify(datos)
@@ -59,7 +62,6 @@ def uploadfile():
 
     if 'file' in request.files:
         file = request.files['file']
-        # objfile = Archivo(file)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -67,7 +69,6 @@ def uploadfile():
             fileu = open(fileupath)
             datfact = [
                 '',
-                request.form['nit'],
                 request.form['codigocom'],
                 request.form['sede'],
                 request.form['fecha']
@@ -75,6 +76,7 @@ def uploadfile():
             objfile = ControladorCopiapp(fileu)
             objfile.setData()
             res = objfile.insertarData(datfact)
+            # return res
             if res == True:
                 return jsonify(objfile.getData())
             else:

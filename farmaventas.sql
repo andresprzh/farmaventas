@@ -1,4 +1,4 @@
-CREATE DATABASE  IF NOT EXISTS farmaventas;
+CREATE DATABASE  IF NOT EXISTS farmacompras;
 /*se usa la base de daos*/
 USE farmaventas;
 -- DROP TABLE copid;
@@ -38,28 +38,37 @@ CREATE TABLE IF NOT EXISTS sedes(
 
 CREATE TABLE IF NOT EXISTS factura(
 	num_factura CHAR(8),
-	nitcomp CHAR(13),
+	nitcomp CHAR(13) DEFAULT '860026123',
 	codcomp CHAR(4),
-	localizacion CHAR(5),
+	sede CHAR(5),
 	fecha DATE,
 	
-	PRIMARY KEY(num_factura)
+	PRIMARY KEY(num_factura),
+	
+	CONSTRAINT fact_sede 
+	FOREIGN KEY (sede)
+	REFERENCES sedes (codigo) 
 );
 
-CREATE TABLE IF NOT EXISTS vitems(
+CREATE TABLE IF NOT EXISTS citems(
 	id_item CHAR(15),
 	unidad CHAR(3),
 	transaccion FLOAT(13,3),
+	transaccion FLOAT(13,3) DEFAULT 0
 	precio_unidad FLOAT(12.2),
 	descuento1 FLOAT(4,2),
-	descuento2 FLOAT(4,2),
+	descuento2 FLOAT(4,2) DEFAULT 0,
 	iva FLOAT(4,2),
-	motivo_compra INT(2),
+	motivo_compra INT(2) DEFAULT 01,
 	factura CHAR(8),
 	
 	PRIMARY KEY(id_item),
 		
-	CONSTRAINT item_fact 
+	CONSTRAINT citem_fact 
 	FOREIGN KEY (factura)
-	REFERENCES factura (num_factura) 
+	REFERENCES factura (num_factura),
+	
+	CONSTRAINT citem_items
+	FOREIGN KEY (id_item)
+	REFERENCES ITEMS (ID_ITEM) 
 );

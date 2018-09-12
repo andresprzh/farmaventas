@@ -1,7 +1,7 @@
 from modelo.conexion import Conexion
 
 
-class ModeloPunto(Conexion):
+class ModeloSede(Conexion):
 
     def __init__(self):
         Conexion.__init__(self)
