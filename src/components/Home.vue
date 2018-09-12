@@ -106,8 +106,8 @@
 
     
     <v-layout row wrap>
-      <v-flex xs12 v-show="mostrart" >
-      <!-- <v-flex xs12  > -->
+      <!-- <v-flex xs12 v-show="mostrart" > -->
+      <v-flex xs12  >
         <v-tabs
           centered
           v-model="tabla"
@@ -120,17 +120,21 @@
 
           <v-tab href="#encontrados">
             Items encontrados
-            <v-icon>fa-clipboard-list</v-icon>
+            <v-icon>fa-check-circle</v-icon>
           </v-tab>
 
           <v-tab href="#noencontrados">
             Items no encontrados
-            <v-icon>fa-box-open</v-icon>
+            <v-icon>fa-times-circle</v-icon>
           </v-tab>
 
         </v-tabs> 
-
-        <template>
+        
+         <!-- DATATABLE ITEMS ENCONTRADOS-->
+        <v-card v-if="tabla=='encontrados'" >
+          <v-card-title class="justify-center">
+            <span class="secondary--text text-xs-center" style="font-size:200%;">Items encontrados</span><br>
+          </v-card-title>
           <v-data-table
             :headers="headers"
             :items="items"
@@ -155,7 +159,46 @@
               <td class="text-xs-center">{{ props.item.transaccion }}</td>
             </template>
           </v-data-table>
-        </template>
+
+          <div class="text-xs-center pt-2">
+            <v-btn color="primary" >
+              <v-icon>fa-file</v-icon>
+                Generar Documento
+            </v-btn>
+          </div>
+
+        </v-card> 
+        <!-- DATATABLE ITEMS NO ENCONTRADOS -->
+        <v-card v-else >
+          <v-card-title class="justify-center">
+            <span class="secondary--text text-xs-center" style="font-size:200%;">Items no encontrados</span><br>
+          </v-card-title>
+          <v-data-table
+            :headers="headersne"
+            :items="itemsne"
+            class="elevation-1"
+          >
+            <template slot="headerCell" slot-scope="props">
+              <v-tooltip bottom>
+                <span slot="activator">
+                  {{ props.header.text }}
+                </span>
+                <span>
+                  {{ props.header.text }}
+                </span>
+              </v-tooltip>
+            </template>
+            <template slot="items" slot-scope="props">
+              <td class="text-xs-center">{{ props.item.descripcion }}</td>
+              <td class="text-xs-center">{{ props.item.cod_barras }}</td>
+              <td class="text-xs-center">{{ props.item.refcopi }}</td>
+              <td class="text-xs-center">{{ props.item.costo_full }}</td>
+              <td class="text-xs-center">{{ props.item.unidad }}</td>
+              <td class="text-xs-center">{{ props.item.descuento }}</td>
+              <td class="text-xs-center">{{ props.item.iva }}</td>
+            </template>
+          </v-data-table>
+        </v-card> 
       </v-flex>
     </v-layout>
 
@@ -177,6 +220,7 @@ export default class Home extends Vue {
   private filename: string = "Subir archivo";
   private valid = true;
   private items: object[] = [];
+  private itemsne: object[] = [];
   // private entradas: object [];
   private entradas = [
     {
@@ -213,12 +257,22 @@ export default class Home extends Vue {
   ];
 
   private headers = [
-    { text: "Descripcion", align: "left", sortable: false, value: "name" },
+    { text: "Descripcion", align: "left", value: "desc" },
+    { text: "Precio unidad", value: "precio" },
+    { text: "Unidad", value: "unidad" },
+    { text: "Descuento", value: "des" },
+    { text: "Iva", value: "iva" },
+    { text: "Transaccion", value: "tran" }
+  ];
+
+   private headersne = [
+    { text: "Descripcion", align: "left", value: "desc" },
+    { text: "Codigo de barras", value: "codbar" },
+    { text: "Referencia", value: "referencia" },
     { text: "Precio unidad", value: "fecha" },
     { text: "Unidad", value: "factura" },
     { text: "Descuento", value: "ref" },
     { text: "Iva", value: "descripcion" },
-    { text: "Transaccion", value: "cantidad" }
   ];
 
   // Mensajes custom error vee validate
@@ -299,7 +353,8 @@ export default class Home extends Vue {
             // this.msg = res.data;
             console.log(res.data);
             if (res.data) {
-              this.items = res.data;
+              this.items = res.data.items;
+              this.itemsne = res.data.itemsne;
               this.mostrart = true;
             } else {
               alert("error al subir el arcivo");

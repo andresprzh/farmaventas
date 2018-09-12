@@ -27,7 +27,7 @@ class ModeloCopiapp(Conexion):
 
     def insertarFact(self, data):
 
-        sql = "INSERT INTO factura(num_factura,codcomp,sede,fecha) VALUES('%s')" % (
+        sql = "INSERT INTO factura(num_factura,codcomp,sede,nombre,fecha,fecha_ingreso) VALUES('%s');" % (
             "','".join(data))
 
         try:
@@ -39,12 +39,14 @@ class ModeloCopiapp(Conexion):
 
     def buscarItem(self, item):
 
-        sql = """SELECT  ITEMS.ID_ITEM, ITEMS.ID_REFERENCIA,  ITEMS.DESCRIPCION, ITEMS.UNIMED_INV_1, ITEMS.IMPUESTO, ITEMS.ULTIMO_COSTO_ED, MIN(COD_BARRAS.ID_CODBAR) AS ID_CODBAR
+        sql = """SELECT ITEMS.ID_ITEM, ITEMS.ID_REFERENCIA,  ITEMS.DESCRIPCION, ITEMS.UNIMED_EMPAQ, ITEMS.UNIMED_INV_1,
+            ITEMS.FACTOR_EMPAQ, ITEMS.IMPUESTO, ITEMS.ULTIMO_COSTO_ED, MIN(COD_BARRAS.ID_CODBAR) AS ID_CODBAR
             FROM COD_BARRAS INNER JOIN ITEMS ON ID_ITEM = ID_ITEMS
             WHERE( ID_REFERENCIA = '%s'
             OR COD_BARRAS.ID_CODBAR = '%s')
-            GROUP BY ITEMS.ID_ITEM,ITEMS.ID_REFERENCIA, ITEMS.DESCRIPCION, ITEMS.UNIMED_INV_1, ITEMS.IMPUESTO, ITEMS.ULTIMO_COSTO_ED;""" % (tuple(item))
-
+            GROUP BY ITEMS.ID_ITEM, ITEMS.ID_REFERENCIA, ITEMS.DESCRIPCION, ITEMS.UNIMED_EMPAQ,
+            ITEMS.UNIMED_INV_1, ITEMS.FACTOR_EMPAQ, ITEMS.IMPUESTO, ITEMS.ULTIMO_COSTO_ED;""" % (tuple(item))
+        
         try:
             self.cursor.execute(sql)
             return self.cursor.fetchall()
@@ -58,12 +60,12 @@ class ModeloCopiapp(Conexion):
 
         sql = "INSERT INTO citems(%s) VALUES" % (",".join(cols))
         for row in data:
-            values = "('%(id_item)s','%(unidad)s','%(transaccion)f','%(precio_unidad)f','%(descuento1)f',%(descuento2)f,%(iva)f,'%(factura)s')," % (
+            values = "('%(id_item)s','%(unidad)s',%(factor)d,'%(transaccion)f','%(precio_unidad)f','%(descuento1)f',%(descuento2)f,%(iva)f,'%(factura)s')," % (
                 row)
             sql += values
 
         sql = sql[:-1]+";"
-        # return sql
+        
         try:
             self.cursor.execute(sql)
             self.conn.commit()

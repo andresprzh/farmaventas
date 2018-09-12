@@ -39,8 +39,12 @@ def allowed_file(filename):
 @app.route('/ping', methods=['GET', 'POST'])
 def ping_pong():
     if request.method == 'GET':
+        
         dato = request.args.get('dato')
+        if dato is None:
+            dato='funciona'
         return jsonify(dato)
+
     if request.method == 'POST':
         datos = request.form
         return jsonify(datos)
@@ -71,12 +75,15 @@ def uploadfile():
                 '',
                 request.form['codigocom'],
                 request.form['sede'],
+                request.form['nombre'],
+                '',
                 request.form['fecha']
             ]
+            
             objfile = ControladorCopiapp(fileu)
             objfile.setData()
             res = objfile.insertarData(datfact)
-            # return res
+            # return jsonify(res)
             if res == True:
                 return jsonify(objfile.getData())
             else:

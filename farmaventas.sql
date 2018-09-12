@@ -1,6 +1,6 @@
 CREATE DATABASE  IF NOT EXISTS farmacompras;
 /*se usa la base de daos*/
-USE farmaventas;
+USE farmacompras;
 -- DROP TABLE copid;
 CREATE TABLE IF NOT EXISTS copid(
 	refcopi	CHAR(15) NOT NULL,
@@ -41,7 +41,9 @@ CREATE TABLE IF NOT EXISTS factura(
 	nitcomp CHAR(13) DEFAULT '860026123',
 	codcomp CHAR(4),
 	sede CHAR(5),
+	nombre CHAR(40),
 	fecha DATE,
+	fecha_ingreso DATE,
 	
 	PRIMARY KEY(num_factura),
 	
@@ -53,6 +55,7 @@ CREATE TABLE IF NOT EXISTS factura(
 CREATE TABLE IF NOT EXISTS citems(
 	id_item CHAR(15),
 	unidad CHAR(3),
+	factor FLOAT(9,4),
 	transaccion FLOAT(13,3),
 	transaccion2 FLOAT(13,3) DEFAULT 0,
 	precio_unidad FLOAT(12.2),

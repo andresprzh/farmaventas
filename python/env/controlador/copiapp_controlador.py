@@ -5,6 +5,7 @@ class ControladorCopiapp:
 
     def __init__(self, file):
         self.file = file
+        self.fecha='' #variable que almacena la fecha de copidrogas
         self.itemsne = []  # variable que almacena items no encontrados
         self.items = []  # variable que almacena los items encontrados
         # objeto del modelo que se comunica con la base de datos
@@ -21,9 +22,12 @@ class ControladorCopiapp:
             # se acomoda la fehca a un formato que detecte mysql
             fecha = fields[1]
             fecha = fecha[0:4]+'-'+fecha[4:6]+'-'+fecha[6:]
+            self.fecha=fecha #se asigna la fecha a la variable de clase
+            
+            # busca si el item ya esta en la base de datos
             item = [fields[3], fields[10]]
             res = self.modelo.buscarItem(item)
-
+            
             # si no hay errores en la busqueda
             if res != False:
 
@@ -34,11 +38,18 @@ class ControladorCopiapp:
                         iditem = row[0]
                         des = row[2]
                         unidad = row[3]
+                        factor= row[5]
+                    # si no se encuentra algun valor o estan en 0 se agrega un valor por default
+                    if not unidad:
+                        unidad='UND'
+                    if factor == 0:
+                        factor=1
 
                     self.items.append({
                         'estado': 'encontrado',
                         'id_item': str(iditem),
                         'unidad': str(unidad),
+                        'factor': float(factor),
                         'transaccion': int(fields[5]),
                         'precio_unidad': int(fields[6]),
                         'descuento1': float(fields[9])/100,
@@ -72,12 +83,15 @@ class ControladorCopiapp:
         # return respuesta
 
     def insertarData(self, datfact):
-
+        
+        # se asignan los dtaos faltantes de la factura
         datfact[0] = self.items[0]['factura'].rstrip()
-
+        datfact[4] = self.fecha
+        
+        
+        # si se logra crear la factura  se insertan los dato
         if self.modelo.insertarFact(datfact):
             data = self.items
-
             res = (self.modelo.insertData(data))
         else:
             res = False
@@ -91,4 +105,8 @@ class ControladorCopiapp:
             return res
 
     def getData(self):
-        return self.items
+        res={
+            'items':self.items,
+            'itemsne':self.itemsne
+        }
+        return res
