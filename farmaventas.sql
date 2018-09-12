@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS citems(
 	id_item CHAR(15),
 	unidad CHAR(3),
 	transaccion FLOAT(13,3),
-	transaccion FLOAT(13,3) DEFAULT 0
+	transaccion2 FLOAT(13,3) DEFAULT 0,
 	precio_unidad FLOAT(12.2),
 	descuento1 FLOAT(4,2),
 	descuento2 FLOAT(4,2) DEFAULT 0,
