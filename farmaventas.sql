@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS copid(
 	unidad CHAR(4),
 	algo1 INT(10),
 	algo2 INT(8),
+	estado INT(1),
 	
 	PRIMARY KEY(refcopi)
 	
@@ -54,6 +55,7 @@ CREATE TABLE IF NOT EXISTS factura(
 
 CREATE TABLE IF NOT EXISTS citems(
 	id_item CHAR(15),
+	factura CHAR(8),
 	unidad CHAR(3),
 	factor FLOAT(9,4),
 	transaccion FLOAT(13,3),
@@ -63,9 +65,9 @@ CREATE TABLE IF NOT EXISTS citems(
 	descuento2 FLOAT(4,2) DEFAULT 0,
 	iva FLOAT(4,2),
 	motivo_compra INT(2) DEFAULT 01,
-	factura CHAR(8),
 	
-	PRIMARY KEY(id_item),
+	
+	PRIMARY KEY(id_item,factura),
 		
 	CONSTRAINT citem_fact 
 	FOREIGN KEY (factura)

@@ -12,7 +12,7 @@ class ModeloCopiapp(Conexion):
 
         sql = "INSERT INTO copid(%s) VALUES" % (",".join(cols))
         for row in data:
-            values = "('%(cod_drog)s','%(fecha)s','%(factura)s','%(refcopi)s','%(descripcion)s',%(cantidad)d,%(costo_desc)d,%(costo_full)d,%(iva)f,%(descuento)f,'%(cod_barras)s','%(cod_fab)s',%(control_line)d,%(descuento_2)f,'%(unidad)s',%(algo1)d,%(algo2)d)," % (
+            values = "('%(cod_drog)s','%(fecha)s','%(factura)s','%(refcopi)s','%(descripcion)s',%(cantidad)d,%(costo_desc)d,%(costo_full)d,%(iva)f,%(descuento)f,'%(cod_barras)s','%(cod_fab)s',%(control_line)d,%(descuento_2)f,'%(unidad)s',%(algo1)d,%(algo2)d,%(estado)d)," % (
                 row)
             sql += values
 
@@ -27,7 +27,7 @@ class ModeloCopiapp(Conexion):
 
     def insertarFact(self, data):
 
-        sql = "INSERT INTO factura(num_factura,codcomp,sede,nombre,fecha,fecha_ingreso) VALUES('%s');" % (
+        sql = "INSERT INTO factura(num_factura,codcomp,sede,nombre,fecha,fecha_ingreso) VALUES('%s')" % (
             "','".join(data))
 
         try:
@@ -39,14 +39,10 @@ class ModeloCopiapp(Conexion):
 
     def buscarItem(self, item):
 
-        sql = """SELECT ITEMS.ID_ITEM, ITEMS.ID_REFERENCIA,  ITEMS.DESCRIPCION, ITEMS.UNIMED_EMPAQ, ITEMS.UNIMED_INV_1,
-            ITEMS.FACTOR_EMPAQ, ITEMS.IMPUESTO, ITEMS.ULTIMO_COSTO_ED, MIN(COD_BARRAS.ID_CODBAR) AS ID_CODBAR
+        sql = """SELECT  ITEMS.ID_ITEM, ITEMS.ID_REFERENCIA,  ITEMS.DESCRIPCION, ITEMS.UNIMED_COM,ITEMS.FACTOR_COM, ITEMS.ULTIMO_COSTO_ED, COD_BARRAS.ID_CODBAR
             FROM COD_BARRAS INNER JOIN ITEMS ON ID_ITEM = ID_ITEMS
             WHERE( ID_REFERENCIA = '%s'
-            OR COD_BARRAS.ID_CODBAR = '%s')
-            GROUP BY ITEMS.ID_ITEM, ITEMS.ID_REFERENCIA, ITEMS.DESCRIPCION, ITEMS.UNIMED_EMPAQ,
-            ITEMS.UNIMED_INV_1, ITEMS.FACTOR_EMPAQ, ITEMS.IMPUESTO, ITEMS.ULTIMO_COSTO_ED;""" % (tuple(item))
-        
+            OR COD_BARRAS.ID_CODBAR = '%s');""" % (tuple(item))
         try:
             self.cursor.execute(sql)
             return self.cursor.fetchall()
@@ -56,7 +52,7 @@ class ModeloCopiapp(Conexion):
     def insertData(self, data):
 
         cols = list(data[0].keys())
-        cols = cols[1:-1]
+        cols = cols[:-1]
 
         sql = "INSERT INTO citems(%s) VALUES" % (",".join(cols))
         for row in data:
@@ -65,7 +61,7 @@ class ModeloCopiapp(Conexion):
             sql += values
 
         sql = sql[:-1]+";"
-        
+
         try:
             self.cursor.execute(sql)
             self.conn.commit()

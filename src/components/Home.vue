@@ -1,10 +1,10 @@
 <template>
   <v-container grid-list-md>
     
-    <h1 class="font-weight-black font-italic text-xs-center" >Formulario</h1>
+    <h1 class="font-weight-black font-italic text-xs-center" >Titulo</h1>
     <!-- INPUTS FORMULARIO -->
       
-    <v-form ref="form"  :v-model="valid" >
+    <v-form ref="form"  :v-model="valid" v-show="!mostrart" >
       <v-layout row wrap>
         <v-flex 
         xs12
@@ -106,8 +106,8 @@
 
     
     <v-layout row wrap>
-      <!-- <v-flex xs12 v-show="mostrart" > -->
-      <v-flex xs12  >
+      <v-flex xs12 v-show="mostrart" >
+      <!-- <v-flex xs12  > -->
         <v-tabs
           centered
           v-model="tabla"
@@ -265,14 +265,14 @@ export default class Home extends Vue {
     { text: "Transaccion", value: "tran" }
   ];
 
-   private headersne = [
+  private headersne = [
     { text: "Descripcion", align: "left", value: "desc" },
     { text: "Codigo de barras", value: "codbar" },
     { text: "Referencia", value: "referencia" },
     { text: "Precio unidad", value: "fecha" },
     { text: "Unidad", value: "factura" },
     { text: "Descuento", value: "ref" },
-    { text: "Iva", value: "descripcion" },
+    { text: "Iva", value: "descripcion" }
   ];
 
   // Mensajes custom error vee validate
@@ -345,6 +345,7 @@ export default class Home extends Vue {
         formData.append("codigocom", this.entradas[3].dato);
         // const valid: boolean = true;
         const path = "http://localhost:5000/copiupload";
+
         this.axios
           .post(path, formData, {
             headers: { "Content-Type": "multipart/form-data" }
