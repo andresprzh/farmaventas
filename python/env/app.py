@@ -35,32 +35,6 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# sanity check route
-@app.route('/ping', methods=['GET', 'POST'])
-def ping_pong():
-    if request.method == 'GET':
-        
-        dato = request.args.get('dato')
-        if dato is None:
-            dato='funciona'
-        return jsonify(dato)
-
-    if request.method == 'POST':
-        datos = request.form
-        return jsonify(datos)
-
-
-@app.route('/puntosv', methods=['GET', 'POST'])
-def puntos():
-    if request.method == 'GET':
-        controlador = ControladorSede()
-        res = controlador.getSedes()
-        return jsonify(res)
-    if request.method == 'POST':
-        datos = request.form
-        return jsonify(datos)
-
-
 @app.route('/copiupload', methods=['POST'])
 def uploadfile():
 
@@ -79,17 +53,67 @@ def uploadfile():
                 '',
                 request.form['fecha']
             ]
-            
+            respuesta = {}
             objfile = ControladorCopiapp(fileu)
             objfile.setData()
             res = objfile.insertarData(datfact)
             # return jsonify(res)
+            if res == 1062:
+                respuesta['estado'] = 'error'
+                respuesta['contenido'] = 'Archivo ya subido a la base de datos'
+                return jsonify(respuesta)
             if res == True:
-                return jsonify(objfile.getData())
+                respuesta['estado'] = 'ok'
+                respuesta['contenido'] = objfile.getData()
+                return jsonify(respuesta)
             else:
                 return jsonify(res)
     else:
         return 'Error'
+
+
+@app.route('/documento', methods=['GET', 'POST'])
+def documento():
+    if request.method == 'GET':
+
+        factura = request.args.get('factura')
+        if factura is None:
+            factura = 'funciona'
+
+        controlador = ControladorCopiapp()
+
+        return jsonify(controlador.getDocument(factura))
+
+    if request.method == 'POST':
+        datos = request.form
+        return jsonify(datos)
+
+# sanity check route
+
+
+@app.route('/ping', methods=['GET', 'POST'])
+def ping_pong():
+    if request.method == 'GET':
+
+        dato = request.args.get('dato')
+        if dato is None:
+            dato = 'funciona'
+        return jsonify(dato)
+
+    if request.method == 'POST':
+        datos = request.form
+        return jsonify(datos)
+
+
+@app.route('/puntosv', methods=['GET', 'POST'])
+def puntos():
+    if request.method == 'GET':
+        controlador = ControladorSede()
+        res = controlador.getSedes()
+        return jsonify(res)
+    if request.method == 'POST':
+        datos = request.form
+        return jsonify(datos)
 
 
 if __name__ == '__main__':

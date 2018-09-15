@@ -3,7 +3,7 @@ from modelo.copiapp_modelo import ModeloCopiapp
 
 class ControladorCopiapp:
 
-    def __init__(self, file):
+    def __init__(self, file=None):
         self.file = file
         self.fecha = ''  # variable que almacena la fecha de copidrogas
         self.itemsne = []  # variable que almacena items no encontrados
@@ -68,6 +68,7 @@ class ControladorCopiapp:
                     # datos de items que no tienen errores
                     data = {
                         'id_item': str(iditem),
+                        'cod_barras': str(item[1]),
                         'unidad': str(unidad),
                         'factor': float(factor),
                         'transaccion': int(fields[5]),
@@ -125,17 +126,17 @@ class ControladorCopiapp:
         datfact[0] = self.items[0]['factura'].rstrip()
         datfact[4] = self.fecha
 
-        # si se logra crear la factura  se insertan los dato
-        if self.modelo.insertarFact(datfact):
+        res = self.modelo.insertarFact(datfact)
+
+        if res and res != 1062:
             data = self.items
             res = (self.modelo.insertData(data))
         else:
-            res = False
+            return res
 
         # si hay items fuera de la base de datos los agrega en una tabla
         if res == True and len(self.itemsne):
             data = self.itemsne
-
             return (self.modelo.insertDataNE(data))
         else:
             return res
@@ -151,6 +152,7 @@ class ControladorCopiapp:
 
         self.items.append({
             'id_item': data['id_item'],
+            'cod_barras': data['cod_barras'],
             'unidad': data['unidad'],
             'factor': data['factor'],
             'transaccion': data['transaccion'],
@@ -183,3 +185,22 @@ class ControladorCopiapp:
             'algo2': data['algo2'],
             'estado': data['estado']
         })
+
+    def getDocument(self, factura):
+        busqueda = self.modelo.buscarDataFactura(factura)
+        # convierte todos los datos a string
+        # busqueda = [[str(x).replace('-', '') for x in tup] for tup in busqueda]
+        # return str(type(busqueda[0][2]))
+        string = ''
+        for row in busqueda:
+            row = list(row)
+            # row.append('')
+            # row[6] = row[6].replace('.', '')
+            # return row[6]
+            # string += '{:8s}{:13s}01{:%Y-%m-%d}{:4s}{:3s}VEI{:15s}{:15s}   {:9f}{:3s}'.format(
+            #     *row)
+
+            string += '{:8s}{:13s}01{:%Y%m%d}{:4s}{:3s}VEI{:15s}{:15}   {:010.4f}{:3s}{:013.3f}+{:013.3f}+{:012.2f}+{:05.2f}{:05.2f}{:05.2f}{:02d}{:23s}000000{:42s}00000000{:20s}'.format(
+                *row, '', '', '').replace('.', '')
+            string += '<br>'
+        return string

@@ -80,29 +80,30 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class App extends Vue {
   public sideNav: boolean = false;
   public menuItems = [
-    {icono: 'fa-home', titulo: 'Home', ruta: '/' },
+    { icono: "fa-home", titulo: "Home", ruta: "/" },
+    { icono: "fa-file-invoice", titulo: "Facturas", ruta: "/Facturas" }
   ];
-  public fondoNav = require('@/assets/fondos/logo2.svg');
+  public fondoNav = require("@/assets/fondos/logo2.svg");
 }
 </script>
 
 <style>
 body {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
-  }
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
 
-  main {
-    flex: 1 0 auto;
-  }
- h1{
-     font-size: 300%;
-  }
+main {
+  flex: 1 0 auto;
+}
+h1 {
+  font-size: 300%;
+}
 </style>

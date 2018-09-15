@@ -1,4 +1,5 @@
 from modelo.conexion import Conexion
+import pymysql
 
 
 class ModeloCopiapp(Conexion):
@@ -33,9 +34,11 @@ class ModeloCopiapp(Conexion):
         try:
             self.cursor.execute(sql)
             self.conn.commit()
+            # self.conn.close()
             return True
-        except:
-            return False
+        except pymysql.err.IntegrityError as e:
+            return e.args[0]
+            # return None
 
     def buscarItem(self, item):
 
@@ -56,7 +59,7 @@ class ModeloCopiapp(Conexion):
 
         sql = "INSERT INTO citems(%s) VALUES" % (",".join(cols))
         for row in data:
-            values = "('%(id_item)s','%(unidad)s',%(factor)d,'%(transaccion)f','%(precio_unidad)f','%(descuento1)f',%(descuento2)f,%(iva)f,'%(factura)s')," % (
+            values = "('%(id_item)s','%(cod_barras)s','%(unidad)s',%(factor)d,'%(transaccion)f','%(precio_unidad)f','%(descuento1)f',%(descuento2)f,%(iva)f,'%(factura)s')," % (
                 row)
             sql += values
 
@@ -66,5 +69,18 @@ class ModeloCopiapp(Conexion):
             self.cursor.execute(sql)
             self.conn.commit()
             return True
+        except pymysql.err.IntegrityError as e:
+            return e.args[1]
+
+    def buscarDataFactura(self, factura):
+        sql = """SELECT factura.num_factura, factura.nitcomp, factura.fecha, factura.codcomp, factura.sede,
+        citems.cod_barras,citems.id_item, citems.factor, citems.unidad, citems.transaccion, citems.transaccion2, citems.precio_unidad, citems.descuento1, citems.descuento2, citems.iva, citems.motivo_compra
+        FROM citems
+        INNER JOIN factura ON factura.num_factura = citems.factura
+        WHERE citems.factura = '%s'""" % (factura)
+
+        try:
+            self.cursor.execute(sql)
+            return self.cursor.fetchall()
         except:
             return False

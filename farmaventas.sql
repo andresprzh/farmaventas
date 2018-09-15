@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS factura(
 
 CREATE TABLE IF NOT EXISTS citems(
 	id_item CHAR(15),
+	cod_barras CHAR(15),
 	factura CHAR(8),
 	unidad CHAR(3),
 	factor FLOAT(9,4),
