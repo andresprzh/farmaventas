@@ -4,7 +4,7 @@
     <h1 class="font-weight-black font-italic text-xs-center" >Titulo</h1>
     <!-- INPUTS FORMULARIO -->
       
-    <v-form ref="form"  :v-model="valid" v-show="!mostrart" >
+    <v-form ref="form"  :v-model="valid" >
       <v-layout row wrap>
         <v-flex 
         xs12
@@ -58,7 +58,7 @@
             :error-messages="errors.collect(card.id)"
             :label="card.titulo"
             :data-vv-name=card.id
-            @change="validar()"
+            @change="validar();getitems();"
             required
           ></v-select>
         </v-flex>
@@ -94,7 +94,7 @@
          <!-- DATATABLE ITEMS ENCONTRADOS-->
         <v-card v-if="tabla=='encontrados'" >
           <v-card-title class="justify-center">
-            <span class="secondary--text text-xs-center" style="font-size:200%;">Items encontrados</span><br>
+            <span class="secondary--text text-xs-center" style="font-size:200%;">Items encontrados factura {{ factura }}</span><br>
           </v-card-title>
           <v-data-table
             :headers="headers"
@@ -122,7 +122,7 @@
           </v-data-table>
 
           <div class="text-xs-center pt-2">
-            <v-btn color="primary" >
+            <v-btn color="primary" @click="generardoc()" >
               <v-icon>fa-file</v-icon>
                 Generar Documento
             </v-btn>
@@ -230,7 +230,6 @@ export default class Factura extends Home {
           }
         })
         .then(res => {
-          console.log(res.data);
           this.ent[1].items = res.data.map(function(
           value: any,
           index: number
@@ -243,6 +242,28 @@ export default class Factura extends Home {
           console.error(error);
         });
     }
+  }
+
+  private getitems():void{
+    const path = this.path+"items";
+      this.axios
+        .get(path, {
+          params: {
+            factura: this.ent[1].dato
+          }
+        })
+        .then(res => {
+          if (res.data){
+            this.items = res.data.contenido.items;
+            this.itemsne = res.data.contenido.itemsne;
+            this.factura = res.data.contenido.factura;
+            this.mostrart = true;
+          }
+        })
+        .catch(error => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
   }
 }
 </script>

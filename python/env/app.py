@@ -55,9 +55,9 @@ def uploadfile():
                 request.form['fecha']
             ]
             respuesta = {}
-            objfile = ControladorCopiapp(fileu)
-            objfile.setData()
-            res = objfile.insertarData(datfact)
+            controlador = ControladorCopiapp(fileu)
+            controlador.setData()
+            res = controlador.insertarData(datfact)
             # return jsonify(res)
             if res == 1062:
                 respuesta['estado'] = 'error'
@@ -65,7 +65,7 @@ def uploadfile():
                 return jsonify(respuesta)
             if res == True:
                 respuesta['estado'] = 'ok'
-                respuesta['contenido'] = objfile.getData()
+                respuesta['contenido'] = controlador.getData()
                 return jsonify(respuesta)
             else:
                 return jsonify(res)
@@ -101,6 +101,26 @@ def facturas():
         res=controlador.getFacturas(fecha)
         return jsonify(res)
         # return jsonify(controlador.getDocument(factura))
+
+    if request.method == 'POST':
+        datos = request.form
+        return jsonify(datos)
+
+@app.route('/items', methods=['GET', 'POST'])
+def items():
+    if request.method == 'GET':
+
+        factura = request.args.get('factura')
+        if factura is None:
+            factura = 'funciona'
+        
+        respuesta = {}
+        controlador = ControladorFactura()
+        res = controlador.setItems(factura)
+        if res:
+            respuesta['estado'] = 'ok'
+            respuesta['contenido'] = controlador.getData()
+            return jsonify(respuesta)
 
     if request.method == 'POST':
         datos = request.form

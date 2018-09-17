@@ -215,9 +215,9 @@ export default class Home extends Vue {
   =============================================================================================================*/
   protected path: string='http://localhost:5000/';
   private file: any = {};
-  private factura: string=''
   // private Item: string = '';
   private filename: string = "Subir archivo";
+  protected factura: string='';
   protected items: object[] = [];
   protected itemsne: object[] = [];
   // private entradas: object [];
@@ -422,7 +422,7 @@ export default class Home extends Vue {
   //   });
   // }
 
-  private generardoc(): void {
+  protected generardoc(): void {
     let str:string='';
     const path = this.path+'documento';
     this.axios
