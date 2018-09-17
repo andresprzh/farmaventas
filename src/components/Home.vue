@@ -133,7 +133,7 @@
          <!-- DATATABLE ITEMS ENCONTRADOS-->
         <v-card v-if="tabla=='encontrados'" >
           <v-card-title class="justify-center">
-            <span class="secondary--text text-xs-center" style="font-size:200%;">Items encontrados</span><br>
+            <span class="secondary--text text-xs-center" style="font-size:200%;">Items encontrados factura {{ factura }}</span><br>
           </v-card-title>
           <v-data-table
             :headers="headers"
@@ -161,7 +161,7 @@
           </v-data-table>
 
           <div class="text-xs-center pt-2" v-if="tabla=='encontrados'">
-            <v-btn color="primary" >
+            <v-btn color="primary" @click="generardoc()" >
               <v-icon>fa-file</v-icon>
                 Generar Documento
             </v-btn>
@@ -213,15 +213,18 @@ export default class Home extends Vue {
   /*===========================================================================================================
                                           ATRIBUTOS
   =============================================================================================================*/
+  protected path: string='http://localhost:5000/';
   private file: any = {};
-  private tabla: string = "";
-  private mostrart: boolean = false;
+  private factura: string=''
   // private Item: string = '';
   private filename: string = "Subir archivo";
-  private valid = true;
-  private items: object[] = [];
-  private itemsne: object[] = [];
+  protected items: object[] = [];
+  protected itemsne: object[] = [];
   // private entradas: object [];
+  protected tabla: string = "";
+  protected mostrart: boolean = false;
+  protected valid = true;
+
   private entradas = [
     {
       id: "dia",
@@ -256,7 +259,7 @@ export default class Home extends Vue {
     }
   ];
 
-  private headers = [
+  protected headers = [
     { text: "Descripcion", align: "left", value: "desc" },
     { text: "Precio unidad", value: "precio" },
     { text: "Unidad", value: "unidad" },
@@ -265,7 +268,7 @@ export default class Home extends Vue {
     { text: "Transaccion", value: "tran" }
   ];
 
-  private headersne = [
+  protected headersne = [
     { text: "Descripcion", align: "left", value: "desc" },
     { text: "Codigo de barras", value: "codbar" },
     { text: "Referencia", value: "referencia" },
@@ -276,27 +279,30 @@ export default class Home extends Vue {
   ];
 
   // Mensajes custom error vee validate
-  private dictionary = {
+  protected dictionary = {
     custom: {
       dia: {
-        required: () => "Por favor seleccione un dia "
+        required: () => 'Por favor seleccione un dia '
         // custom messages
       },
       drog: {
-        required: "Por favor seleccione una sede"
+        required: 'Por favor seleccione una sede'
       },
       nombre: {
-        required: "Por favor digite el nombre"
+        required: 'Por favor digite el nombre'
       },
       codcompra: {
-        required: "por favor digite el codigo de compra",
-        max: "Maximo 4 caracteres"
+        required: 'por favor digite el codigo de compra',
+        max: 'Maximo 4 caracteres'
       },
       ftramite: {
-        required: "Por favor seleccione una fecha"
+        required: 'Por favor seleccione una fecha'
       },
       nit: {
-        required: "Por favor digite el NIT"
+        required: 'Por favor digite el NIT'
+      },
+      fact:{
+        required: 'Por favor Seleccione la factura'
       }
     }
   };
@@ -307,11 +313,11 @@ export default class Home extends Vue {
   constructor() {
     super();
 
-    const path = "http://localhost:5000/puntosv";
+    const path = this.path+'puntosv';
     this.axios
       .get(path, {
         params: {
-          dato: "all"
+          dato: 'all'
         }
       })
       .then(res => {
@@ -319,7 +325,7 @@ export default class Home extends Vue {
           value: any,
           index: number
         ) {
-          return value["num_sede"];
+          return value['num_sede'];
         });
       })
       .catch(error => {
@@ -328,8 +334,20 @@ export default class Home extends Vue {
       });
   }
 
-  private mounted() {
+  protected mounted() {
     this.$validator.localize("es", this.dictionary);
+  }
+  protected fecha(ref: any, dato: string): void {
+    this.validar();
+    ref.save(dato);
+  }
+
+  protected validar(): void {
+    this.$validator.validateAll().then(result => {
+      if (result) {
+        this.valid = true;
+      }
+    });
   }
 
   private processFile(event: any) {
@@ -338,31 +356,32 @@ export default class Home extends Vue {
         this.file = event.target.files[0];
         this.filename = this.file.name;
         let formData = new FormData();
-        formData.append("file", this.file);
-        formData.append("fecha", this.entradas[0].dato);
-        formData.append("sede", this.entradas[1].dato);
-        formData.append("nombre", this.entradas[2].dato);
-        formData.append("codigocom", this.entradas[3].dato);
+        formData.append('file', this.file);
+        formData.append('fecha', this.entradas[0].dato);
+        formData.append('sede', this.entradas[1].dato);
+        formData.append('nombre', this.entradas[2].dato);
+        formData.append('codigocom', this.entradas[3].dato);
         // const valid: boolean = true;
-        const path = "http://localhost:5000/copiupload";
+        const path = this.path+"copiupload";
 
         this.axios
           .post(path, formData, {
-            headers: { "Content-Type": "multipart/form-data" }
+            headers: { 'Content-Type': 'multipart/form-data' }
           })
           .then(res => {
             // this.msg = res.data;
             console.log(res.data);
             if (res.data) {
-              if (res.data.estado == "error") {
+              if (res.data.estado == 'error') {
                 alert(res.data.contenido);
               } else {
                 this.items = res.data.contenido.items;
                 this.itemsne = res.data.contenido.itemsne;
+                this.factura = res.data.contenido.factura;
                 this.mostrart = true;
               }
             } else {
-              alert("error al subir el arcivo");
+              alert('error al subir el arcivo');
             }
           })
           .catch(error => {
@@ -403,30 +422,29 @@ export default class Home extends Vue {
   //   });
   // }
 
-  private fecha(ref: any, dato: string): void {
-    this.validar();
-    ref.save(dato);
-  }
-
-  private validar(): void {
-    this.$validator.validateAll().then(result => {
-      if (result) {
-        this.valid = true;
-      }
-    });
-  }
-
   private generardoc(): void {
-    const path = "http://localhost:5000/document";
+    let str:string='';
+    const path = this.path+'documento';
     this.axios
       .get(path, {
         params: {
-          dato: "asdñdlakdlak"
+          factura: this.factura
         }
       })
       .then(res => {
-        // this.msg = res.data;
-        alert(res.data);
+        
+        const str:string=String(res.data);
+        const nomdoc = 'plano_salida.txt';
+        let element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(str));
+        element.setAttribute('download', nomdoc);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
       })
       .catch(error => {
         // eslint-disable-next-line
@@ -437,29 +455,29 @@ export default class Home extends Vue {
 </script>
 
 <style scoped>
-input[type="file"] {
-  width: 0.1px;
-  height: 0.1px;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  z-index: -1;
-}
+  input[type="file"] {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+  }
 
-input[type="file"] + label {
-  padding: 5px;
-  border-radius: 20px;
-  font-weight: 700;
-  color: white;
-  background-color: #1b5e20;
-  display: inline-block;
-  cursor: pointer;
-}
+  input[type="file"] + label {
+    padding: 5px;
+    border-radius: 20px;
+    font-weight: 700;
+    color: white;
+    background-color: #1b5e20;
+    display: inline-block;
+    cursor: pointer;
+  }
 
-input[type="file"]:focus + label,
-input[type="file"] + label:hover {
-  background-color: rgb(57, 148, 63);
-  outline: 1px dotted #000;
-  outline: -webkit-focus-ring-color auto 5px;
-}
+  input[type="file"]:focus + label,
+  input[type="file"] + label:hover {
+    background-color: rgb(57, 148, 63);
+    outline: 1px dotted #000;
+    outline: -webkit-focus-ring-color auto 5px;
+  }
 </style>

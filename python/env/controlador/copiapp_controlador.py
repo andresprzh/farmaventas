@@ -4,6 +4,7 @@ from modelo.copiapp_modelo import ModeloCopiapp
 class ControladorCopiapp:
 
     def __init__(self, file=None):
+        self.factura=''
         self.file = file
         self.fecha = ''  # variable que almacena la fecha de copidrogas
         self.itemsne = []  # variable que almacena items no encontrados
@@ -125,6 +126,7 @@ class ControladorCopiapp:
         # se asignan los dtaos faltantes de la factura
         datfact[0] = self.items[0]['factura'].rstrip()
         datfact[4] = self.fecha
+        self.factura=datfact[0]
 
         res = self.modelo.insertarFact(datfact)
 
@@ -144,7 +146,8 @@ class ControladorCopiapp:
     def getData(self):
         res = {
             'items': self.items,
-            'itemsne': self.itemsne
+            'itemsne': self.itemsne,
+            'factura': self.factura
         }
         return res
 
@@ -202,5 +205,5 @@ class ControladorCopiapp:
 
             string += '{:8s}{:13s}01{:%Y%m%d}{:4s}{:3s}VEI{:15s}{:15}   {:010.4f}{:3s}{:013.3f}+{:013.3f}+{:012.2f}+{:05.2f}{:05.2f}{:05.2f}{:02d}{:23s}000000{:42s}00000000{:20s}'.format(
                 *row, '', '', '').replace('.', '')
-            string += '<br>'
+            string += '\r\n' 
         return string

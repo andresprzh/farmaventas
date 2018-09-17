@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 
 from controlador.copiapp_controlador import ControladorCopiapp
 from controlador.sede_controlador import ControladorSede
+from controlador.factura_controlador import ControladorFactura
 
 FILE_PATH = os.path.abspath(__file__)
 UPLOAD_FOLDER = os.path.dirname(FILE_PATH)+'/temp'
@@ -88,9 +89,25 @@ def documento():
         datos = request.form
         return jsonify(datos)
 
+@app.route('/facturas', methods=['GET', 'POST'])
+def facturas():
+    if request.method == 'GET':
+
+        fecha = request.args.get('fecha')
+        if fecha is None:
+            fecha = 'funciona'
+
+        controlador = ControladorFactura()
+        res=controlador.getFacturas(fecha)
+        return jsonify(res)
+        # return jsonify(controlador.getDocument(factura))
+
+    if request.method == 'POST':
+        datos = request.form
+        return jsonify(datos)
+
+
 # sanity check route
-
-
 @app.route('/ping', methods=['GET', 'POST'])
 def ping_pong():
     if request.method == 'GET':

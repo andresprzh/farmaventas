@@ -8,7 +8,7 @@
       <v-layout row wrap>
         <v-flex 
         xs12
-        v-for="(card,index) in entradas"
+        v-for="(card,index) in ent"
         :key="card.id"
         > 
          <v-menu v-if="card.tipo==='fecha'"
@@ -34,28 +34,29 @@
               :error-messages="errors.collect(card.id)"
               v-validate="card.validacion"
               :data-vv-name=card.id
-              @input="validar()"
+              @input="validar()"              
             ></v-text-field>
             <v-date-picker
               v-model="card.dato"
               no-title
               scrollable
+              
             >
               <v-spacer></v-spacer>
               <v-btn flat color="primary" @click="validar();card.menu = false">Cancel</v-btn>
               
-              <v-btn flat color="primary" @click="fecha($refs.menu[index],card.dato)">OK</v-btn>
+              <v-btn flat color="primary" @click="fecha($refs.menu[index],card.dato);setfecha();">OK</v-btn>
               
             </v-date-picker>
           </v-menu>
 
-          <v-select v-else-if="card.tipo==='select'"
+          <v-select v-else-if="card.tipo==='select'" v-show="mostrarfac"
             ref="menu"
             v-validate="card.validacion"
             :items="card.items"
             v-model="card.dato"
             :error-messages="errors.collect(card.id)"
-            label="Sede"
+            :label="card.titulo"
             :data-vv-name=card.id
             @change="validar()"
             required
@@ -167,23 +168,15 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import Home from "./Home.vue";
 
 @Component
-export default class Home extends Vue {
+export default class Factura extends Home {
   /*===========================================================================================================
                                           ATRIBUTOS
   =============================================================================================================*/
-  private file: any = {};
-  private tabla: string = "";
-  private mostrart: boolean = false;
-  // private Item: string = '';
-  private filename: string = "Subir archivo";
-  private valid = true;
-  private items: object[] = [];
-  private itemsne: object[] = [];
-  // private entradas: object [];
-
-  private entradas = [
+  private mostrarfac: boolean=false;
+  private ent = [
     {
       id: "dia",
       titulo: "Dia",
@@ -193,47 +186,63 @@ export default class Home extends Vue {
       validacion: "required"
     },
     {
-      id: "drog",
-      titulo: "Codigo Drogueria",
+      id: "fact",
+      titulo: "Numero de Factura",
       dato: "",
       tipo: "select",
       // items: ["009VE", "015VE", "017VE", "020VE"],
       items: [],
       validacion: "required"
     },
-    {
-      id: "nombre",
-      titulo: "Nombre",
-      dato: "",
-      tipo: "texto",
-      validacion: "required"
-    },
-    {
-      id: "codcompra",
-      titulo: "codigo comprador",
-      dato: "",
-      tipo: "numero",
-      validacion: "required|max:4"
+    // {
+    //   id: "nombre",
+    //   titulo: "Nombre",
+    //   dato: "",
+    //   tipo: "texto",
+    //   validacion: "required"
+    // },
+    // {
+    //   id: "codcompra",
+    //   titulo: "codigo comprador",
+    //   dato: "",
+    //   tipo: "numero",
+    //   validacion: "required|max:4"
+    // }
+  ];
+
+  /*===========================================================================================================
+                                          METODOS
+  =============================================================================================================*/
+  constructor() {
+    super();
+  }
+
+  private setfecha():void{
+    if (this.ent[0].dato){
+      // console.log(this.ent[0].dato);
+      this.mostrarfac=true;
+
+      const path = this.path+"facturas";
+      this.axios
+        .get(path, {
+          params: {
+            fecha: this.ent[0].dato
+          }
+        })
+        .then(res => {
+          console.log(res.data);
+          this.ent[1].items = res.data.map(function(
+          value: any,
+          index: number
+          ) {
+            return value[0];
+          });
+        })
+        .catch(error => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
     }
-  ];
-
-  private headers = [
-    { text: "Descripcion", align: "left", value: "desc" },
-    { text: "Precio unidad", value: "precio" },
-    { text: "Unidad", value: "unidad" },
-    { text: "Descuento", value: "des" },
-    { text: "Iva", value: "iva" },
-    { text: "Transaccion", value: "tran" }
-  ];
-
-  private headersne = [
-    { text: "Descripcion", align: "left", value: "desc" },
-    { text: "Codigo de barras", value: "codbar" },
-    { text: "Referencia", value: "referencia" },
-    { text: "Precio unidad", value: "fecha" },
-    { text: "Unidad", value: "factura" },
-    { text: "Descuento", value: "ref" },
-    { text: "Iva", value: "descripcion" }
-  ];
+  }
 }
 </script>

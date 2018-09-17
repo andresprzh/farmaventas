@@ -24,7 +24,13 @@ class Conexion:
                                     charset='utf8mb4')
         self.cursor = self.conn.cursor()
 
-    def buscarItem(self, tabla):
-
-        self.cursor.execute("SELECT * from %s" % tabla)
-        return self.cursor.fetchall()
+    def buscarItem(self, tabla,valor=None,item=None):
+        if(valor==None):
+            self.cursor.execute("SELECT * from %s" % tabla)
+            return self.cursor.fetchall()
+        else:
+            # sql="SELECT * from %s WHERE %s = '%s'" % (tabla,valor,item)
+            # return sql
+            self.cursor.execute("SELECT * from %s WHERE %s = '%s'" % (tabla,valor,item))
+            return self.cursor.fetchall()
+        
