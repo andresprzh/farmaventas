@@ -8,11 +8,11 @@
     >
     <v-card>
       
-      <v-card-media
+      <v-img
           :src=fondoNav
           height="300px"
       >
-      </v-card-media>
+      </v-img>
       <v-divider></v-divider>
     </v-card>
     

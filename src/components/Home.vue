@@ -314,6 +314,7 @@ export default class Home extends Vue {
     super();
 
     const path = this.path+'puntosv';
+    console.log(path);
     this.axios
       .get(path, {
         params: {

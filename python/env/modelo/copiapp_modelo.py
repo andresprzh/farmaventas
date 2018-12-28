@@ -45,7 +45,7 @@ class ModeloCopiapp(Conexion):
         sql = """SELECT  ITEMS.ID_ITEM, ITEMS.ID_REFERENCIA,  ITEMS.DESCRIPCION, ITEMS.UNIMED_COM,ITEMS.FACTOR_COM, ITEMS.ULTIMO_COSTO_ED, COD_BARRAS.ID_CODBAR
             FROM COD_BARRAS INNER JOIN ITEMS ON ID_ITEM = ID_ITEMS
             WHERE( ID_REFERENCIA = '%s'
-            OR COD_BARRAS.ID_CODBAR = '%s');""" % (tuple(item))
+            OR COD_BARRAS.ID_CODBAR = '%s') LIMIT 1;""" % (tuple(item))
         try:
             self.cursor.execute(sql)
             return self.cursor.fetchall()
